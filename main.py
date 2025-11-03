@@ -118,6 +118,3 @@ if __name__ == "__main__":
     app = CipherApp()
 
     app.run()
-
-
-    
