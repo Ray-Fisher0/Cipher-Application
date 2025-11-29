@@ -6,13 +6,14 @@ class CipherApp:
     def __init__(self):
         # Setup window and set name and dimensions
         self.root = tk.Tk()
-        self.root.title("Cipher Encryption Application")
-        self.root.geometry("750x600")
+        self.root.title("Cipher Encryption / Decryption Tool")
+        self.root.geometry("700x550")
+        self.root.configure(bg="#F5F5F5")
 
-        self.shift = randint(0, 25)
+        self.shift = tk.IntVar(value=randint(0, 25))
         self.non_alpha = tk.IntVar()
 
-        self.setupGUI()
+        self.setup_gui()
 
     def validate_input(P):
         if P.isdigit() or P == "":
@@ -25,6 +26,7 @@ class CipherApp:
         shift = shift % 26
 
         res = []
+
         for char in text:
             if char.isalpha():
                 is_upper = char.isupper()
@@ -44,94 +46,83 @@ class CipherApp:
             elif self.non_alpha.get() == 0:
                 # Preserve non-alphabetic chars
                 res.append(char)
-
         return ''.join(res)
 
+    # Button Handlers
     def encrypt(self):
-        # Encryption function
-        enc_text = self.base_text.get(1.0, tk.END)
-        
-        enc_text = self.shift_cipher(enc_text, self.shift)
-
-        # Delete old text 
-        self.res_text.delete(1.0, tk.END)
-        self.res_text.insert(tk.END, enc_text)
+        shift = self.shift.get()
+        text = self.input_text.get("1.0", tk.END)
+        result = self.shift_cipher(text, shift)
+        self.output_text.delete("1.0", tk.END)
+        self.output_text.insert(tk.END, result)
 
     def decrypt(self):
-        # Decryption function
-        dec_text = self.res_text.get(1.0, tk.END)
-
-        dec_text = self.shift_cipher(dec_text, -self.shift)
-
-        # Delete old text and insert new
-        self.base_text.delete(1.0, tk.END)
-        self.base_text.insert(tk.END, dec_text)
+        shift = -self.shift.get()
+        text = self.input_text.get("1.0", tk.END)
+        result = self.shift_cipher(text, shift)
+        self.output_text.delete("1.0", tk.END)
+        self.output_text.insert(tk.END, result)
 
     def clear(self):
-        # Clear
-        self.base_text.delete(1.0, tk.END)
+        self.input_text.delete("1.0", tk.END)
+        self.output_text.delete("1.0", tk.END)
 
-        self.res_text.delete(1.0, tk.END)
+    # Input Validation
+    def validate_int(self, val):
+        return val.isdigit() or val == ""
 
-    def setupGUI(self):
-        self.tabControl = ttk.Notebook(self.root)
-
-        self.setup_tabs(self.tabControl)
-
-        # Set up tab1
-        self.tab1 = tk.Frame(self.tabControl)
-        self.tab1.pack(pady=20)
-
-        # Create Buttons
-        self.enc_button = tk.Button(self.tab1, text="Encrypt", font = ('Helvetica', 18), command=self.encrypt)
-        self.enc_button.grid(row=0, column=0)
-
-        self.dec_button = tk.Button(self.tab1, text="Decrypt", font = ('Helvetica', 18), command=self.decrypt)
-        self.dec_button.grid(row=0, column=1, padx=30)
-
-        self.clear_button = tk.Button(self.tab1, text="Clear", font = ('Helvetica', 18), command=self.clear)
-        self.clear_button.grid(row=0, column=2, padx=10)
-
-        # Setup Options
-        self.checkbox = ttk.Checkbutton(
+    # GUI Layout
+    def setup_gui(self):
+        title = tk.Label(
             self.root,
-            text='Only alphanumeric symbols',
-            variable=self.non_alpha,
-            onvalue=1,
-            offvalue=0
+            text="Cipher Encryption / Decryption Tool",
+            font=("Helvetica", 26, "bold"),
+            bg="#F5F5F5"
         )
+        title.pack(pady=15)
 
-        self.checkbox.place(x=10, y=30)
+        # Frame for shift + options
+        option_frame = tk.Frame(self.root, bg="#F5F5F5")
+        option_frame.pack(pady=5)
 
-        vcmd = self.root.register(self.validate_input)
+        # Shift Input
+        tk.Label(option_frame, text="Shift Amount:", font=("Helvetica", 14), bg="#F5F5F5").grid(row=0, column=0, padx=5)
 
-        # Create Entry widget with validation
-        entry = tk.Entry(self.root, validate="key", validatecommand=(vcmd, "%P"))
-        entry.pack(pady=20)
+        vcmd = (self.root.register(self.validate_int), "%P")
+        shift_entry = tk.Entry(option_frame, width=5, font=("Helvetica", 14), textvariable=self.shift,
+                               validate="key", validatecommand=vcmd)
+        shift_entry.grid(row=0, column=1, padx=10)
 
-        # Create a label
-        label = tk.Label(self.root, text="Enter an integer:")
-        label.pack(pady=5)
+        # Checkbox option
+        ttk.Checkbutton(option_frame,
+                        text="Preserve non-alphabetic characters",
+                        variable=self.non_alpha).grid(row=0, column=2, padx=10)
 
-        # Main text editor
-        self.enc_label = tk.Label(self.root, text="Decrypted Text:", font = ('Helvetica', 18))
-        self.enc_label.pack()
+        # Text Input Frame
+        input_frame = tk.Frame(self.root, bg="#F5F5F5")
+        input_frame.pack(pady=10)
 
-        self.base_text = tk.Text(self.root, width=50, height=10)
-        self.base_text.pack(pady=10)
+        tk.Label(input_frame, text="Input Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
+        self.input_text = tk.Text(input_frame, width=70, height=7, font=("Helvetica", 12))
+        self.input_text.pack(pady=5)
 
-        self.dec_label = tk.Label(self.root, text="Encrypted Text:", font = ('Helvetica', 18))
-        self.dec_label.pack()
+        # Buttons
+        button_frame = tk.Frame(self.root, bg="#F5F5F5")
+        button_frame.pack(pady=10)
 
-        self.res_text = tk.Text(self.root, width=50, height=10)
-        self.res_text.pack(pady=10)
+        ttk.Button(button_frame, text="Encrypt", command=self.encrypt).grid(row=0, column=0, padx=15)
+        ttk.Button(button_frame, text="Decrypt", command=self.decrypt).grid(row=0, column=1, padx=15)
+        ttk.Button(button_frame, text="Clear", command=self.clear).grid(row=0, column=2, padx=15)
 
-    def setup_tabs(self, tabControl):
-        tabControl.pack(expand=1, fill="both")
+        # Output Frame
+        output_frame = tk.Frame(self.root, bg="#F5F5F5")
+        output_frame.pack(pady=10)
 
-        self.tab2 = ttk.Frame(tabControl)
+        tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
+        self.output_text = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
+        self.output_text.pack(pady=5)
 
-
+    # Run App
     def run(self):
         self.root.mainloop()
 
