@@ -7,12 +7,18 @@ class CipherApp:
         # Setup window and set name and dimensions
         self.root = tk.Tk()
         self.root.title("Cipher Encryption Application")
-        self.root.geometry("500x600")
+        self.root.geometry("750x600")
 
         self.shift = randint(0, 25)
         self.non_alpha = tk.IntVar()
 
         self.setupGUI()
+
+    def validate_input(P):
+        if P.isdigit() or P == "":
+            return True
+        return False
+
 
     def shift_cipher(self, text, shift):
         # Shift needs to be in range between 0-25
@@ -68,20 +74,22 @@ class CipherApp:
         self.res_text.delete(1.0, tk.END)
 
     def setupGUI(self):
-        tabControl = ttk.Notebook(self.root)
+        self.tabControl = ttk.Notebook(self.root)
 
-        # Set up frame
-        self.my_frame = tk.Frame(self.root)
-        self.my_frame.pack(pady=20)
+        self.setup_tabs(self.tabControl)
+
+        # Set up tab1
+        self.tab1 = tk.Frame(self.tabControl)
+        self.tab1.pack(pady=20)
 
         # Create Buttons
-        self.enc_button = tk.Button(self.my_frame, text="Encrypt", font = ('Helvetica', 18), command=self.encrypt)
+        self.enc_button = tk.Button(self.tab1, text="Encrypt", font = ('Helvetica', 18), command=self.encrypt)
         self.enc_button.grid(row=0, column=0)
 
-        self.dec_button = tk.Button(self.my_frame, text="Decrypt", font = ('Helvetica', 18), command=self.decrypt)
+        self.dec_button = tk.Button(self.tab1, text="Decrypt", font = ('Helvetica', 18), command=self.decrypt)
         self.dec_button.grid(row=0, column=1, padx=30)
 
-        self.clear_button = tk.Button(self.my_frame, text="Clear", font = ('Helvetica', 18), command=self.clear)
+        self.clear_button = tk.Button(self.tab1, text="Clear", font = ('Helvetica', 18), command=self.clear)
         self.clear_button.grid(row=0, column=2, padx=10)
 
         # Setup Options
@@ -93,7 +101,17 @@ class CipherApp:
             offvalue=0
         )
 
-        self.checkbox.pack()
+        self.checkbox.place(x=10, y=30)
+
+        vcmd = self.root.register(self.validate_input)
+
+        # Create Entry widget with validation
+        entry = tk.Entry(self.root, validate="key", validatecommand=(vcmd, "%P"))
+        entry.pack(pady=20)
+
+        # Create a label
+        label = tk.Label(self.root, text="Enter an integer:")
+        label.pack(pady=5)
 
         # Main text editor
         self.enc_label = tk.Label(self.root, text="Decrypted Text:", font = ('Helvetica', 18))
@@ -108,8 +126,11 @@ class CipherApp:
         self.res_text = tk.Text(self.root, width=50, height=10)
         self.res_text.pack(pady=10)
 
-    def setup_tabs(self):
-        pass
+    def setup_tabs(self, tabControl):
+        tabControl.pack(expand=1, fill="both")
+
+        self.tab2 = ttk.Frame(tabControl)
+
 
     def run(self):
         self.root.mainloop()
