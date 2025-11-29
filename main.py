@@ -155,8 +155,12 @@ class CipherApp:
     
     # Clear Input and Output
     def clear(self):
-        self.input_text.delete("1.0", tk.END)
-        self.output_text.delete("1.0", tk.END)
+        if self.notebook.index(self.notebook.select()) == 0:
+            self.caesar_input.delete("1.0", tk.END)
+        elif self.notebook.index(self.notebook.select()) == 1:
+            self.rev_input.delete("1.0", tk.END)
+        else:
+            self.play_input.delete("1.0", tk.END)
 
     # Input Validation
     def validate_int(self, val):
@@ -175,8 +179,8 @@ class CipherApp:
             with open(filename, "r", encoding="utf-8") as file:
                 data = file.read()
             if self.notebook.index(self.notebook.select()) == 0:
-                self.input_text.delete("1.0", tk.END)
-                self.input_text.insert(tk.END, data)
+                self.caesar_input.delete("1.0", tk.END)
+                self.caesar_input.insert(tk.END, data)
             elif self.notebook.index(self.notebook.select()) == 1:
                 self.rev_input.delete("1.0", tk.END)
                 self.rev_input.insert(tk.END, data)
@@ -247,8 +251,8 @@ class CipherApp:
         input_frame.pack(pady=10)
 
         tk.Label(input_frame, text="Input Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
-        self.input_text = tk.Text(input_frame, width=70, height=7, font=("Helvetica", 12))
-        self.input_text.pack(pady=5)
+        self.caesar_input = tk.Text(input_frame, width=70, height=7, font=("Helvetica", 12))
+        self.caesar_input.pack(pady=5)
 
         # Buttons
         button_frame = tk.Frame(frame, bg="#F5F5F5")
@@ -263,8 +267,8 @@ class CipherApp:
         output_frame.pack(pady=10)
 
         tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
-        self.output_text = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
-        self.output_text.pack(pady=5)
+        self.caesar_output = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
+        self.caesar_output.pack(pady=5)
 
         # Save / Load Buttons
         file_frame = tk.Frame(frame, bg="#F5F5F5")
@@ -304,13 +308,21 @@ class CipherApp:
         button_frame = tk.Frame(frame, bg="#F5F5F5")
         button_frame.pack()
         ttk.Button(button_frame, text="Encrypt",
-                   command=self.reverse_encrypt).grid(row=0, column=0, padx=10)
+                   command=self.reverse_encrypt).grid(row=0, column=0, padx=15)
         ttk.Button(button_frame, text="Decrypt",
-                   command=self.reverse_encrypt).grid(row=0, column=1, padx=10)
+                   command=self.reverse_encrypt).grid(row=0, column=1, padx=15)
+        ttk.Button(button_frame, text="Clear", command=self.clear).grid(row=0, column=2, padx=15)
 
         self.rev_output = tk.Text(frame, width=70, height=7, font=("Helvetica", 12))
         tk.Label(frame, text="Output Text:", bg="#F5F5F5").pack()
         self.rev_output.pack(pady=5)
+
+         # Save / Load Buttons
+        file_frame = tk.Frame(frame, bg="#F5F5F5")
+        file_frame.pack(pady=5)
+
+        ttk.Button(file_frame, text="Load Text File", command=self.load_file).grid(row=0, column=0, padx=20)
+        ttk.Button(file_frame, text="Save Output to File", command=self.save_output).grid(row=0, column=1, padx=20)
 
     def reverse_encrypt(self):
         text = self.rev_input.get("1.0", tk.END)
@@ -342,13 +354,21 @@ class CipherApp:
         button_frame = tk.Frame(frame, bg="#F5F5F5")
         button_frame.pack()
         ttk.Button(button_frame, text="Encrypt",
-                   command=self.playfair_encrypt_text).grid(row=0, column=0, padx=10)
+                   command=self.playfair_encrypt_text).grid(row=0, column=0, padx=15)
         ttk.Button(button_frame, text="Decrypt",
-                   command=self.playfair_decrypt_text).grid(row=0, column=1, padx=10)
+                   command=self.playfair_decrypt_text).grid(row=0, column=1, padx=15)
+        ttk.Button(button_frame, text="Clear", command=self.clear).grid(row=0, column=2, padx=15)
 
         self.play_output = tk.Text(frame, width=70, height=7, font=("Helvetica", 12))
         tk.Label(frame, text="Output Text:", bg="#F5F5F5").pack()
         self.play_output.pack(pady=5)
+
+         # Save / Load Buttons
+        file_frame = tk.Frame(frame, bg="#F5F5F5")
+        file_frame.pack(pady=5)
+
+        ttk.Button(file_frame, text="Load Text File", command=self.load_file).grid(row=0, column=0, padx=20)
+        ttk.Button(file_frame, text="Save Output to File", command=self.save_output).grid(row=0, column=1, padx=20)
 
     def playfair_encrypt_text(self):
         text = self.play_input.get("1.0", tk.END)
