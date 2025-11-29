@@ -4,14 +4,16 @@ from tkinter import filedialog, messagebox
 from random import randint
 
 ALPHABET = "ABCDEFGHIKLMNOPQRSTUVWXYZ"  # 'J' is typically omitted in Playfair cipher
+BACKGROUND_COLOR = "#F5F5F5"
+DIMENSIONS = "700x620"
 
 class CipherApp:
     def __init__(self):
         # Setup window and set name and dimensions
         self.root = tk.Tk()
         self.root.title("Cipher Encryption / Decryption Tool")
-        self.root.geometry("700x600")
-        self.root.configure(bg="#F5F5F5")
+        self.root.geometry(DIMENSIONS)
+        self.root.configure(bg=BACKGROUND_COLOR)
 
         # Variables
         self.shift = tk.IntVar(value=randint(0, 25))
@@ -24,9 +26,9 @@ class CipherApp:
         self.notebook.pack(expand=True, fill="both")
 
         # Tabs
-        self.tab_caesar = tk.Frame(self.notebook, bg="#F5F5F5")
-        self.tab_reverse = tk.Frame(self.notebook, bg="#F5F5F5")
-        self.tab_playfair = tk.Frame(self.notebook, bg="#F5F5F5")
+        self.tab_caesar = tk.Frame(self.notebook, bg=BACKGROUND_COLOR)
+        self.tab_reverse = tk.Frame(self.notebook, bg=BACKGROUND_COLOR)
+        self.tab_playfair = tk.Frame(self.notebook, bg=BACKGROUND_COLOR)
 
         self.notebook.add(self.tab_caesar, text="Caesar Cipher")
         self.notebook.add(self.tab_reverse, text="Reverse Cipher")
@@ -73,7 +75,13 @@ class CipherApp:
     
     # Reverse Cipher functions
     def reverse_cipher(self, text):
-        return text[::-1]
+        rev = ""
+        # Loop through each character in original string
+        for ch in text:
+            # Add current character to front of reversed string
+            if ch != '\n':
+                rev = ch + rev
+        return rev
     
     # Playfair Cipher functions
     def playfair_generate_table(self, key):
@@ -217,7 +225,7 @@ class CipherApp:
         except Exception as e:
             messagebox.showerror("Error", f"Couldn't save file:\n{e}")
 
-    # GUI Layout
+    # Caesar Cipher Tab
     def build_caesar_tab(self):
         frame = self.tab_caesar
 
@@ -225,17 +233,16 @@ class CipherApp:
             frame,
             text="Caesar Cipher Encryption / Decryption",
             font=("Helvetica", 24, "bold"),
-            bg="#F5F5F5"
+            bg=BACKGROUND_COLOR
         )
         title.pack(pady=15)
 
         # Frame for shift + options
-        option_frame = tk.Frame(frame, bg="#F5F5F5")
+        option_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         option_frame.pack(pady=5)
 
         # Shift Input
-        tk.Label(option_frame, text="Shift Amount:", font=("Helvetica", 14), bg="#F5F5F5").grid(row=0, column=0, padx=5)
-
+        tk.Label(option_frame, text="Shift Amount:", font=("Helvetica", 14), bg=BACKGROUND_COLOR).grid(row=0, column=0, padx=5)
         vcmd = (self.root.register(self.validate_int), "%P")
         shift_entry = tk.Entry(option_frame, width=5, font=("Helvetica", 14), textvariable=self.shift,
                                validate="key", validatecommand=vcmd)
@@ -247,15 +254,15 @@ class CipherApp:
                         variable=self.non_alpha).grid(row=0, column=2, padx=10)
 
         # Text Input Frame
-        input_frame = tk.Frame(frame, bg="#F5F5F5")
+        input_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         input_frame.pack(pady=10)
 
-        tk.Label(input_frame, text="Input Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
+        tk.Label(input_frame, text="Input Text:", font=("Helvetica", 16), bg=BACKGROUND_COLOR).pack()
         self.caesar_input = tk.Text(input_frame, width=70, height=7, font=("Helvetica", 12))
         self.caesar_input.pack(pady=5)
 
         # Buttons
-        button_frame = tk.Frame(frame, bg="#F5F5F5")
+        button_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         button_frame.pack(pady=10)
 
         ttk.Button(button_frame, text="Encrypt", command=self.caesar_encrypt).grid(row=0, column=0, padx=15)
@@ -263,15 +270,15 @@ class CipherApp:
         ttk.Button(button_frame, text="Clear", command=self.clear).grid(row=0, column=2, padx=15)
 
         # Output Frame
-        output_frame = tk.Frame(frame, bg="#F5F5F5")
+        output_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         output_frame.pack(pady=10)
 
-        tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
+        tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg=BACKGROUND_COLOR).pack()
         self.caesar_output = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
         self.caesar_output.pack(pady=5)
 
         # Save / Load Buttons
-        file_frame = tk.Frame(frame, bg="#F5F5F5")
+        file_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         file_frame.pack(pady=5)
 
         ttk.Button(file_frame, text="Load Text File", command=self.load_file).grid(row=0, column=0, padx=20)
@@ -297,15 +304,20 @@ class CipherApp:
             frame,
             text="Reverse Cipher Encryption / Decryption",
             font=("Helvetica", 24, "bold"),
-            bg="#F5F5F5"
+            bg=BACKGROUND_COLOR
         )
         title.pack(pady=15)
 
-        self.rev_input = tk.Text(frame, width=70, height=7, font=("Helvetica", 12))
-        tk.Label(frame, text="Input Text:", bg="#F5F5F5").pack()
+        # Text Input Frame
+        input_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
+        input_frame.pack(pady=10)
+
+        tk.Label(input_frame, text="Input Text:", font=("Helvetica", 16), bg=BACKGROUND_COLOR).pack()
+        self.rev_input = tk.Text(input_frame, width=70, height=7, font=("Helvetica", 12))
         self.rev_input.pack(pady=5)
 
-        button_frame = tk.Frame(frame, bg="#F5F5F5")
+        # Button Frame
+        button_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         button_frame.pack()
         ttk.Button(button_frame, text="Encrypt",
                    command=self.reverse_encrypt).grid(row=0, column=0, padx=15)
@@ -313,12 +325,16 @@ class CipherApp:
                    command=self.reverse_encrypt).grid(row=0, column=1, padx=15)
         ttk.Button(button_frame, text="Clear", command=self.clear).grid(row=0, column=2, padx=15)
 
-        self.rev_output = tk.Text(frame, width=70, height=7, font=("Helvetica", 12))
-        tk.Label(frame, text="Output Text:", bg="#F5F5F5").pack()
+        # Output Frame
+        output_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
+        output_frame.pack(pady=10)
+
+        tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg=BACKGROUND_COLOR).pack()
+        self.rev_output = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
         self.rev_output.pack(pady=5)
 
-         # Save / Load Buttons
-        file_frame = tk.Frame(frame, bg="#F5F5F5")
+        # Save / Load Buttons
+        file_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         file_frame.pack(pady=5)
 
         ttk.Button(file_frame, text="Load Text File", command=self.load_file).grid(row=0, column=0, padx=20)
@@ -334,24 +350,30 @@ class CipherApp:
     def build_playfair_tab(self):
         frame = self.tab_playfair
 
+        # Title and Key Input
         title = tk.Label(
             frame,
             text="Playfair Cipher Encryption / Decryption",
             font=("Helvetica", 24, "bold"),
-            bg="#F5F5F5"
+            bg=BACKGROUND_COLOR
         )
         title.pack(pady=15)
 
         tk.Label(frame, text="Playfair Key:", font=("Helvetica", 14),
-                 bg="#F5F5F5").pack(pady=5)
+                 bg=BACKGROUND_COLOR).pack(pady=5)
         tk.Entry(frame, textvariable=self.playfair_key,
                  width=15, font=("Helvetica", 14)).pack()
 
-        self.play_input = tk.Text(frame, width=70, height=7, font=("Helvetica", 12))
-        tk.Label(frame, text="Input Text:", bg="#F5F5F5").pack()
+        # Text Input Frame
+        input_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
+        input_frame.pack(pady=10)
+
+        tk.Label(input_frame, text="Input Text:", font=("Helvetica", 16), bg=BACKGROUND_COLOR).pack()
+        self.play_input = tk.Text(input_frame, width=70, height=7, font=("Helvetica", 12))
         self.play_input.pack(pady=5)
 
-        button_frame = tk.Frame(frame, bg="#F5F5F5")
+        # Button Frame
+        button_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         button_frame.pack()
         ttk.Button(button_frame, text="Encrypt",
                    command=self.playfair_encrypt_text).grid(row=0, column=0, padx=15)
@@ -359,12 +381,16 @@ class CipherApp:
                    command=self.playfair_decrypt_text).grid(row=0, column=1, padx=15)
         ttk.Button(button_frame, text="Clear", command=self.clear).grid(row=0, column=2, padx=15)
 
-        self.play_output = tk.Text(frame, width=70, height=7, font=("Helvetica", 12))
-        tk.Label(frame, text="Output Text:", bg="#F5F5F5").pack()
+        # Output Frame
+        output_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
+        output_frame.pack(pady=10)
+
+        tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg=BACKGROUND_COLOR).pack()
+        self.play_output = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
         self.play_output.pack(pady=5)
 
-         # Save / Load Buttons
-        file_frame = tk.Frame(frame, bg="#F5F5F5")
+        # Save / Load Buttons
+        file_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
         file_frame.pack(pady=5)
 
         ttk.Button(file_frame, text="Load Text File", command=self.load_file).grid(row=0, column=0, padx=20)
