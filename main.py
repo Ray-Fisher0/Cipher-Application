@@ -7,7 +7,7 @@ class CipherApp:
         # Setup window and set name and dimensions
         self.root = tk.Tk()
         self.root.title("Cipher Encryption / Decryption Tool")
-        self.root.geometry("700x550")
+        self.root.geometry("700x600")
         self.root.configure(bg="#F5F5F5")
 
         self.shift = tk.IntVar(value=randint(0, 25))
@@ -70,6 +70,44 @@ class CipherApp:
     # Input Validation
     def validate_int(self, val):
         return val.isdigit() or val == ""
+    
+    # File Operations
+    def load_file(self):
+        filename = tk.filedialog.askopenfilename(
+            title="Load Text File",
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        )
+        if not filename:
+            return
+        
+        try:
+            with open(filename, "r", encoding="utf-8") as file:
+                data = file.read()
+            self.input_text.delete("1.0", tk.END)
+            self.input_text.insert(tk.END, data)
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Couldn't load file:\n{e}")
+
+    def save_output(self):
+        text = self.output_text.get("1.0", tk.END).strip()
+        if not text:
+            tk.messagebox.showwarning("Empty Output", "There is no text to save.")
+            return
+
+        filename = tk.filedialog.asksaveasfilename(
+            title="Save Output As",
+            defaultextension=".txt",
+            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
+        )
+        if not filename:
+            return
+
+        try:
+            with open(filename, "w", encoding="utf-8") as file:
+                file.write(text)
+            tk.messagebox.showinfo("Saved", "File saved successfully!")
+        except Exception as e:
+            tk.messagebox.showerror("Error", f"Couldn't save file:\n{e}")
 
     # GUI Layout
     def setup_gui(self):
@@ -121,6 +159,13 @@ class CipherApp:
         tk.Label(output_frame, text="Output Text:", font=("Helvetica", 16), bg="#F5F5F5").pack()
         self.output_text = tk.Text(output_frame, width=70, height=7, font=("Helvetica", 12))
         self.output_text.pack(pady=5)
+
+        # Save / Load Buttons
+        file_frame = tk.Frame(self.root, bg="#F5F5F5")
+        file_frame.pack(pady=5)
+
+        ttk.Button(file_frame, text="Load Text File", command=self.load_file).grid(row=0, column=0, padx=20)
+        ttk.Button(file_frame, text="Save Output to File", command=self.save_output).grid(row=0, column=1, padx=20)
 
     # Run App
     def run(self):
