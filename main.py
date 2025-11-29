@@ -40,10 +40,11 @@ class CipherApp:
         self.build_playfair_tab()
 
     # Ceaser Cipher functions
-    def validate_input(P):
-        if P.isdigit() or P == "":
-            return True
-        return False
+    def validate_input(self, P):
+        for char in P:
+            if not char.isalpha() or char == 'J' or char == 'j':
+                return False
+        return True
 
 
     def shift_cipher(self, text, shift):
@@ -165,10 +166,13 @@ class CipherApp:
     def clear(self):
         if self.notebook.index(self.notebook.select()) == 0:
             self.caesar_input.delete("1.0", tk.END)
+            self.caesar_output.delete("1.0", tk.END)
         elif self.notebook.index(self.notebook.select()) == 1:
             self.rev_input.delete("1.0", tk.END)
+            self.rev_output.delete("1.0", tk.END)
         else:
             self.play_input.delete("1.0", tk.END)
+            self.play_output.delete("1.0", tk.END)
 
     # Input Validation
     def validate_int(self, val):
@@ -361,8 +365,9 @@ class CipherApp:
 
         tk.Label(frame, text="Playfair Key:", font=("Helvetica", 14),
                  bg=BACKGROUND_COLOR).pack(pady=5)
+        playfair_vcmd = (self.root.register(self.validate_input), "%P")
         tk.Entry(frame, textvariable=self.playfair_key,
-                 width=15, font=("Helvetica", 14)).pack()
+                 width=15, font=("Helvetica", 14), validate="key", validatecommand=playfair_vcmd).pack()
 
         # Text Input Frame
         input_frame = tk.Frame(frame, bg=BACKGROUND_COLOR)
